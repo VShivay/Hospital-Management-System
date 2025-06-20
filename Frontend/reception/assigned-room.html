@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Assigned Rooms</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #e0f2fe, #bbdefb); /* Light blue gradient */
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.15), 0 6px 10px -3px rgba(0, 0, 0, 0.08);
+        }
+        .header-gradient {
+            background: -webkit-linear-gradient(left, #1e3a8a, #2563eb); /* Dark blue to blue gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Message box styles (reused from previous design) */
+        #messageBox {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none; /* Hidden by default */
+            font-weight: 600;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #messageBox.success {
+            background-color: #d1fae5; /* Green-100 */
+            color: #065f46; /* Green-800 */
+        }
+        #messageBox.error {
+            background-color: #fee2e2; /* Red-100 */
+            color: #991b1b; /* Red-800 */
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-6 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl lg:text-4xl font-extrabold mb-8 flex items-center gap-3 header-gradient">
+            <i class="ph ph-bed text-blue-600 text-4xl lg:text-5xl"></i>
+            Assigned Rooms
+        </h1>
+
+        <div id="messageBox" class="flex items-center gap-2">
+            <i id="messageIcon" class="text-xl"></i>
+            <span id="messageText"></span>
+        </div>
+
+        <div id="assignedRoomsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+
+        <div id="noRoomsMessage" class="hidden text-center py-12 card mt-8">
+            <p class="text-gray-500 text-lg">
+                <i class="ph ph-info text-2xl mr-2"></i> No rooms are currently assigned.
+            </p>
+            <p class="text-gray-400 mt-2">Check back later or assign rooms from the receptionist panel.</p>
+        </div>
+    </div>
+
+    <script>
+        // Placeholder for BASE_URL. In a real application, this would be dynamically set.
+        // For testing purposes, you might set it to a mock API endpoint or a development server.
+        // Replace with your actual backend URL
+
+        // Function to show custom message box (reused from previous design)
+        function showMessage(message, type = 'success') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const messageIcon = document.getElementById('messageIcon');
+
+            messageBox.className = ''; // Clear existing classes
+            messageBox.classList.add(type);
+            messageText.textContent = message;
+
+            if (type === 'success') {
+                messageIcon.className = 'ph ph-check-circle';
+            } else if (type === 'error') {
+                messageIcon.className = 'ph ph-x-circle';
+            }
+
+            messageBox.style.display = 'flex';
+            messageBox.style.opacity = '1';
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                messageBox.style.opacity = '0';
+                setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 300); // Wait for fade out transition
+            }, 5000);
+        }
+
+        const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
+
+        /**
+         * Fetches assigned rooms data from the backend and populates the UI.
+         */
+        async function loadAssignedRooms() {
+            const container = document.getElementById("assignedRoomsContainer");
+            const noRoomsMessage = document.getElementById("noRoomsMessage");
+            container.innerHTML = ""; // Clear existing cards
+            noRoomsMessage.classList.add('hidden'); // Hide no rooms message by default
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/reception/assigned-rooms`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to fetch assigned rooms.");
+                }
+
+                if (data.length === 0) {
+                    noRoomsMessage.classList.remove('hidden'); // Show no rooms message
+                    return;
+                }
+
+                data.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "card p-6 border-b-4 border-blue-500 relative overflow-hidden"; /* Added border-b for accent */
+
+                    card.innerHTML = `
+                        <div class="absolute top-0 right-0 h-16 w-16 bg-blue-100 rounded-bl-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">
+                            <i class="ph ph-tag-simple text-blue-500 text-xl rotate-45"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center gap-2">
+                            <i class="ph ph-user-circle text-blue-600 text-2xl"></i> ${item.patient_name}
+                        </h2>
+                        <div class="space-y-2 text-gray-700">
+                            <p class="flex items-center gap-2"><i class="ph ph-calendar text-blue-500"></i> <strong>Date:</strong> <span class="font-medium">${item.appointment_date}</span></p>
+                            <p class="flex items-center gap-2"><i class="ph ph-door-open text-green-600"></i> <strong>Room:</strong> <span class="font-medium">${item.room_number}</span> (<span class="text-sm italic">${item.class_name}</span>)</p>
+                            <p class="flex items-center gap-2"><i class="ph ph-currency-rupee text-purple-600"></i> <strong>Charge:</strong> <span class="font-medium">₹${item.charge}</span></p>
+                            <p class="flex items-center gap-2"><i class="ph ph-user-md text-red-500"></i> <strong>Doctor:</strong> <span class="font-medium">Dr. ${item.doctor_name}</span></p>
+                            <p class="flex items-center gap-2"><i class="ph ph-stethoscope text-orange-500"></i> <strong>Specialization:</strong> <span class="font-medium">${item.specialization}</span></p>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                showMessage("Failed to load assigned rooms. " + err.message, 'error');
+                console.error("Fetch error:", err);
+                noRoomsMessage.classList.remove('hidden'); // Show message even on error if no data could be loaded
+                noRoomsMessage.querySelector('p').textContent = "Failed to load assigned rooms. Please try again.";
+                noRoomsMessage.querySelector('i').className = "ph ph-warning text-red-500 text-2xl mr-2";
+            }
+        }
+
+        // Initialize data loading when the page content is fully loaded
+        document.addEventListener('DOMContentLoaded', loadAssignedRooms);
+    </script>
+
+</body>
+</html>

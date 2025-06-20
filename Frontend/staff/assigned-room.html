@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8">
+  <title>Assigned Rooms</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="mb-4">Assigned Rooms</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="roomsTable">
+        <thead class="table-dark">
+          <tr>
+            <th>Room Number</th>
+            <th>Class</th>
+            <th>Charge</th>
+            <th>Patient Name</th>
+            <th>Patient Email</th>
+            <th>Patient Phone</th>
+            <th>Doctor</th>
+            <th>Specialization</th>
+            <th>Appointment Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Visited</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic data here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("staffToken"); // Assumes JWT token stored in localStorage
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function formatTime(timeString) {
+      const time = new Date(`1970-01-01T${timeString}Z`);
+      return time.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    async function fetchAssignedRooms() {
+      try {
+        const res = await fetch(`${BASE_URL}/api/staff/allassigned-rooms`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch assigned rooms");
+
+        const rooms = await res.json();
+        const tableBody = document.querySelector("#roomsTable tbody");
+
+        if (rooms.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="12" class="text-center">No assigned rooms found.</td></tr>`;
+          return;
+        }
+
+        rooms.forEach(room => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${room.room_number}</td>
+            <td>${room.class_name}</td>
+            <td>${room.charge}</td>
+            <td>${room.patient_name}</td>
+            <td>${room.patient_email}</td>
+            <td>${room.patient_number}</td>
+            <td>${room.doctor_name}</td>
+            <td>${room.specialization}</td>
+            <td>${formatDate(room.appointment_date)}</td>
+            <td>${formatTime(room.appointment_time)}</td>
+            <td>${room.status}</td>
+            <td>${room.visited}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+      } catch (error) {
+        console.error("Error loading assigned rooms:", error);
+        alert("Unable to load assigned rooms. Please check your login or try again.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchAssignedRooms);
+  </script>
+</body>
+</html>

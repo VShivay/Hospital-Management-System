@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patient Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6 font-sans">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+      <i data-feather="user" class="text-blue-500 w-8 h-8"></i>
+      Patient Full Information
+    </h2>
+
+    <div id="info" class="space-y-8"></div>
+  </div>
+
+  <script>
+    async function loadPatientData() {
+      const pid = sessionStorage.getItem("selectedPatientId");
+      if (!pid) {
+        document.body.innerHTML = "<p class='text-red-500 text-lg'>No patient selected. Go back.</p>";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/reception/patient-info/${pid}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+
+        const data = await res.json();
+        const info = document.getElementById("info");
+
+        if (!data.patient) {
+          info.innerHTML = "<p class='text-red-500'>Patient not found.</p>";
+          return;
+        }
+
+        let html = `
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-2xl font-semibold mb-4 text-blue-600 flex items-center gap-2">
+              <i data-feather="user-check"></i> Patient Info
+            </h3>
+            <p><strong>Name:</strong> ${data.patient.name || "Not Provided"}</p>
+            <p><strong>Email:</strong> ${data.patient.email || "Not Provided"}</p>
+            <p><strong>Number:</strong> ${data.patient.number || "Not Provided"}</p>
+            <p><strong>Address:</strong> ${data.patient.address || "Not Provided"}</p>
+            <p><strong>Created At:</strong> ${data.patient.created_at || "N/A"}</p>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold mt-10 mb-4 text-green-600 flex items-center gap-2">
+              <i data-feather="calendar"></i> Appointments
+            </h3>
+        `;
+
+        if (!data.appointments || data.appointments.length === 0) {
+          html += `<p class="text-gray-600">No appointments found.</p>`;
+        } else {
+          html += data.appointments.map(app => `
+            <div class="bg-white shadow-md rounded-lg p-6 mb-6 border-l-4 border-blue-500">
+              <div class="mb-2 text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i data-feather="clock"></i> ${app.datetime || "Invalid Date"}
+              </div>
+              <p><strong>Status:</strong> ${app.status || "Not Provided"}</p>
+              <p><strong>Visited:</strong> ${app.visited ? "Yes" : "No"}</p>
+              ${app.new_date ? `<p><strong>Rescheduled To:</strong> ${app.new_date}</p>` : ''}
+              <p><strong>Doctor:</strong> ${app.doctor_name || 'Not Assigned'} (${app.specialization || 'Unknown'})</p>
+              <p><strong>Fees:</strong> ₹${app.fees != null ? app.fees : 0}</p>
+              <p><strong>Room:</strong> ${app.room_number || 'N/A'} (${app.class_name || 'N/A'})</p>
+              <p><strong>Room Charge:</strong> ₹${app.room_charge != null ? app.room_charge : 0}</p>
+              <p><strong>Bill Amount:</strong> ₹${app.bill_amount != null ? app.bill_amount : 0}</p>
+              <p><strong>Medicine Charge:</strong> ₹${app.medicine_charge != null ? app.medicine_charge : 0}</p>
+              <p><strong>Bill Date:</strong> ${app.bill_datetime || "N/A"}</p>
+
+              <div class="mt-4">
+                <p class="font-semibold flex items-center gap-1">
+                  <i data-feather="file-text"></i> Prescriptions:
+                </p>
+                <ul class="list-disc list-inside text-gray-700 mt-1">
+                  ${
+                    app.prescriptions?.length
+                      ? app.prescriptions.map(p =>
+                        `<li>${p.medicine_name || "Unknown"} ×${p.quantity || 0} (${p.notes || 'No notes'})</li>`).join('')
+                      : '<li>No prescriptions</li>'
+                  }
+                </ul>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        html += '</div>';
+        info.innerHTML = html;
+        feather.replace(); // Render feather icons
+      } catch (err) {
+        console.error("Failed to load patient info:", err);
+        document.body.innerHTML = "<p class='text-red-600'>Error loading data.</p>";
+      }
+    }
+
+    loadPatientData();
+  </script>
+</body>
+</html>

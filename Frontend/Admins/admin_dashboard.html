@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Inter Font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for sidebar */
+        .sidebar-nav::-webkit-scrollbar {
+            width: 8px;
+        }
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: #2c3e50;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+            background: #5a677d;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+
+    <!-- Modal Structure -->
+    <div id="customModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-11/12 max-w-sm text-center">
+            <p id="modalMessage" class="text-gray-800 text-lg mb-6"></p>
+            <div id="modalButtons" class="flex justify-center space-x-4">
+                <!-- Buttons will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 text-white p-6 flex flex-col fixed h-full shadow-lg z-40">
+        <div class="flex items-center mb-10">
+            <svg class="w-8 h-8 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.001 12.001 0 002.944 12c.047 2.062.938 4.016 2.404 5.584A15.938 15.938 0 0012 21.056c2.571-.053 5.093-.761 7.292-2.146a15.938 15.938 0 002.404-5.584A12.001 12.001 0 0021.056 12c-.047-2.062-.938-4.016-2.404-5.584z"></path>
+            </svg>
+            <h2 class="text-2xl font-bold">Admin Panel</h2>
+        </div>
+
+        <nav class="flex-1 sidebar-nav overflow-y-auto pr-2">
+            <ul>
+                <li class="mb-2">
+                    <a href="javascript:void(0);" onclick="loadPage('dashboard')" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="home" class="w-5 h-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="add_doctors.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i>
+                        <span>Add Doctor</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="add_reception.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="user-round-plus" class="w-5 h-5"></i>
+                        <span>Add Receptionist</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="add_staff.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="users-round" class="w-5 h-5"></i>
+                        <span>Add Staff</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="admin_patients.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="folder-symlink" class="w-5 h-5"></i>
+                        <span>View All Patients</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="getDoctors.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="stethoscope" class="w-5 h-5"></i>
+                        <span>View Doctors</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="getReception.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="user-check" class="w-5 h-5"></i>
+                        <span>View Receptionists</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="getStaff.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span>View Staff</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="view_appointments.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                        <span>View Appointments</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="view_bills.html" class="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                        <span>View Bills</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 ml-64 p-6">
+        <!-- Navbar (Top) -->
+        <header class="bg-white p-4 shadow-md rounded-lg mb-6 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-5 rounded-md shadow-md transition-colors duration-200 flex items-center space-x-2">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Logout</span>
+            </button>
+        </header>
+
+        <!-- Welcome Section -->
+        <section class="bg-white p-8 rounded-lg shadow-md mb-6">
+            <h2 class="text-4xl font-extrabold text-gray-900 mb-2">Welcome, <span id="adminName" class="text-indigo-600">Admin</span>!</h2>
+            <p class="text-gray-600 text-lg">Manage your hospital operations efficiently from here.</p>
+        </section>
+
+        <!-- Dashboard Overview Cards -->
+        <section id="dashboard-overview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+            <div class="bg-blue-500 text-white p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-transform duration-300 cursor-pointer">
+                <i data-lucide="clipboard-list" class="w-12 h-12 mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Total Appointments</h3>
+                <p id="totalAppointments" class="text-3xl font-bold">Loading...</p>
+            </div>
+            <div class="bg-green-500 text-white p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-transform duration-300 cursor-pointer">
+                <i data-lucide="users" class="w-12 h-12 mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Registered Patients</h3>
+                <p id="registeredPatients" class="text-3xl font-bold">Loading...</p>
+            </div>
+            <div class="bg-purple-500 text-white p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-transform duration-300 cursor-pointer">
+                <i data-lucide="user-round-plus" class="w-12 h-12 mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">New Registrations Today</h3>
+                <p id="newRegistrationsToday" class="text-3xl font-bold">Loading...</p>
+            </div>
+            <div class="bg-yellow-500 text-white p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-transform duration-300 cursor-pointer">
+                <i data-lucide="trending-up" class="w-12 h-12 mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Revenue (Monthly)</h3>
+                <p id="monthlyRevenue" class="text-3xl font-bold">Loading...</p>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Area -->
+        <div id="mainContent" class="mt-6 bg-white p-8 rounded-lg shadow-md">
+            <!-- Content from dynamically loaded pages will appear here. -->
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Dashboard Overview</h3>
+            <p class="text-gray-600">Click on a sidebar link to view specific sections or use the overview cards above.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Placeholder for BASE_URL. In a real application, this would be loaded from url.js or a config.
+        const BASE_URL = "http://localhost:5000"; // Replace with your actual base URL
+
+        // --- Global Firebase Variables (Mandatory for Canvas Environment) ---
+        // These variables are provided by the Canvas environment.
+        // DO NOT remove or modify them.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // --- End of Global Firebase Variables ---
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Custom Modal Logic
+        const customModal = document.getElementById('customModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalButtons = document.getElementById('modalButtons');
+
+        /**
+         * Displays a custom modal with a message and specified buttons.
+         * @param {string} message - The message to display in the modal.
+         * @param {Array<{text: string, className: string, action: Function}>} buttons - Array of button configurations.
+         */
+        function showCustomModal(message, buttons) {
+            modalMessage.textContent = message;
+            modalButtons.innerHTML = ''; // Clear previous buttons
+
+            buttons.forEach(btnConfig => {
+                const button = document.createElement('button');
+                button.textContent = btnConfig.text;
+                button.className = `py-2 px-4 rounded-md font-medium transition-colors duration-200 ${btnConfig.className}`;
+                button.onclick = () => {
+                    customModal.classList.add('hidden'); // Hide modal on click
+                    btnConfig.action();
+                };
+                modalButtons.appendChild(button);
+            });
+            customModal.classList.remove('hidden'); // Show modal
+        }
+
+        // Authentication Check
+        const token = localStorage.getItem("admin_token");
+
+        if (!token) {
+            showCustomModal("Please login first to access the dashboard.", [
+                { text: "OK", className: "bg-blue-500 hover:bg-blue-600 text-white", action: () => { window.location.href = "admin_login.html"; } }
+            ]);
+        } else {
+            // Display logged-in admin name
+            fetch(`${BASE_URL}/api/admin/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Failed to fetch admin data.");
+                }
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById("adminName").textContent = data.name;
+            })
+            .catch(error => {
+                console.error("Error fetching admin data:", error);
+                showCustomModal("Session expired or invalid. Please login again.", [
+                    { text: "Login", className: "bg-red-500 hover:bg-red-600 text-white", action: () => {
+                        localStorage.removeItem("admin_token");
+                        window.location.href = "admin_login.html";
+                    }}
+                ]);
+            });
+        }
+
+        // Logout logic
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            showCustomModal("Are you sure you want to logout?", [
+                { text: "Cancel", className: "bg-gray-300 hover:bg-gray-400 text-gray-800", action: () => {} }, // Do nothing on cancel
+                { text: "Logout", className: "bg-red-500 hover:bg-red-600 text-white", action: () => {
+                    localStorage.removeItem("admin_token");
+                    window.location.href = "admin_login.html";
+                }}
+            ]);
+        });
+
+        /**
+         * Fetches dashboard data and updates the overview cards.
+         */
+        async function fetchDashboardData() {
+            const headers = { Authorization: `Bearer ${token}` };
+
+            try {
+                // Fetch Total Appointments
+                const appointmentsRes = await fetch(`${BASE_URL}/api/admin/appcount`, { headers });
+                const appointmentsData = await appointmentsRes.json();
+                document.getElementById('totalAppointments').textContent = appointmentsData.count !== undefined ? appointmentsData.count.toLocaleString() : 'N/A';
+
+                // Fetch Registered Patients
+                const patientsRes = await fetch(`${BASE_URL}/api/admin/patientcount`, { headers });
+                const patientsData = await patientsRes.json();
+                document.getElementById('registeredPatients').textContent = patientsData.count !== undefined ? patientsData.count.toLocaleString() : 'N/A';
+
+                // Fetch New Registrations Today
+                const newPatientsRes = await fetch(`${BASE_URL}/api/admin/counttoday`, { headers });
+                const newPatientsData = await newPatientsRes.json();
+                document.getElementById('newRegistrationsToday').textContent = newPatientsData.count !== undefined ? newPatientsData.count.toLocaleString() : 'N/A';
+
+                // Fetch Monthly Revenue
+                const revenueRes = await fetch(`${BASE_URL}/api/admin/revenuemonthly`, { headers });
+                const revenueData = await revenueRes.json();
+                document.getElementById('monthlyRevenue').textContent = revenueData.totalRevenue !== undefined ? `$${revenueData.totalRevenue.toLocaleString()}` : 'N/A';
+
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+                // Optionally show an error message on the dashboard cards or a modal
+                document.getElementById('totalAppointments').textContent = 'Error';
+                document.getElementById('registeredPatients').textContent = 'Error';
+                document.getElementById('newRegistrationsToday').textContent = 'Error';
+                document.getElementById('monthlyRevenue').textContent = 'Error';
+            }
+        }
+
+        /**
+         * Fetches recent appointments and displays them in the list.
+         */
+        async function fetchRecentAppointments() {
+            const headers = { Authorization: `Bearer ${token}` };
+            try {
+                const response = await fetch(`${BASE_URL}/api/admin/apprecent`, { headers });
+                if (!response.ok) throw new Error('Failed to fetch recent appointments.');
+                const appointments = await response.json();
+                const ul = document.getElementById('recentAppointmentsList');
+                ul.innerHTML = ''; // Clear existing list items
+                if (appointments.length === 0) {
+                    ul.innerHTML = '<li class="text-gray-500">No recent appointments.</li>';
+                } else {
+                    appointments.forEach(app => {
+                        // Format date consistently as YYYY-MM-DD
+                        const appDate = new Date(app.date);
+                        const formattedDate = `${appDate.getFullYear()}-${(appDate.getMonth() + 1).toString().padStart(2, '0')}-${appDate.getDate().toString().padStart(2, '0')}`;
+
+                        const li = document.createElement('li');
+                        li.textContent = `Dr. ${app.doctor_name} - Patient ${app.patient_name} (${formattedDate}, ${app.time})`;
+                        ul.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching recent appointments:", error);
+                document.getElementById('recentAppointmentsList').innerHTML = '<li class="text-red-500">Error loading recent appointments.</li>';
+            }
+        }
+
+        /**
+         * Fetches new patient registrations and displays them in the list.
+         */
+        async function fetchRecentPatients() {
+            const headers = { Authorization: `Bearer ${token}` };
+            try {
+                const response = await fetch(`${BASE_URL}/api/admin/patrecent`, { headers });
+                if (!response.ok) throw new Error('Failed to fetch recent patients.');
+                const patients = await response.json();
+                const ul = document.getElementById('newPatientsList');
+                ul.innerHTML = ''; // Clear existing list items
+                if (patients.length === 0) {
+                    ul.innerHTML = '<li class="text-gray-500">No new patients recently.</li>';
+                } else {
+                    patients.forEach(patient => {
+                        const li = document.createElement('li');
+                        // Format created_at date consistently as YYYY-MM-DD
+                        const createdAtDate = new Date(patient.created_at);
+                        const formattedDate = `${createdAtDate.getFullYear()}-${(createdAtDate.getMonth() + 1).toString().padStart(2, '0')}-${createdAtDate.getDate().toString().padStart(2, '0')}`;
+                        li.textContent = `${patient.name} - Registered on ${formattedDate}`;
+                        ul.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching recent patients:", error);
+                document.getElementById('newPatientsList').innerHTML = '<li class="text-red-500">Error loading new patients.</li>';
+            }
+        }
+
+
+        /**
+         * Function to load content dynamically into the mainContent div.
+         * Currently, the sidebar links are direct hrefs, but this function
+         * provides the mechanism if dynamic loading is desired in the future.
+         * @param {string} page - The identifier for the page to load (e.g., 'dashboard', 'add_doctors').
+         */
+        function loadPage(page) {
+            const mainContentDiv = document.getElementById('mainContent');
+            let contentHtml = '';
+
+            // This is a simple example. In a real app, you'd fetch from a server
+            // or use a more robust client-side routing library.
+            switch(page) {
+                case 'dashboard':
+                    contentHtml = `
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Dashboard Overview</h3>
+                        <p class="text-gray-600">This is the main dashboard content. You can add charts, recent activities, or quick links here.</p>
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-blue-50 rounded-lg p-4 shadow-sm">
+                                <h4 class="font-medium text-lg text-blue-800">Recent Appointments</h4>
+                                <ul id="recentAppointmentsList" class="list-disc pl-5 mt-2 text-gray-700">
+                                    <li>Loading recent appointments...</li>
+                                </ul>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 shadow-sm">
+                                <h4 class="font-medium text-lg text-green-800">New Patients</h4>
+                                <ul id="newPatientsList" class="list-disc pl-5 mt-2 text-gray-700">
+                                    <li>Loading new patients...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    mainContentDiv.innerHTML = contentHtml; // Set HTML first
+                    // Now fetch data for the dashboard elements
+                    fetchDashboardData();
+                    fetchRecentAppointments();
+                    fetchRecentPatients();
+                    break;
+                // Add more cases for other pages if you implement dynamic loading
+                // For now, the sidebar links directly navigate.
+                default:
+                    contentHtml = `<h3 class="text-2xl font-semibold text-gray-800 mb-4">Content for ${page}</h3><p class="text-gray-600">This area would typically display details for ${page}.</p>`;
+                    mainContentDiv.innerHTML = contentHtml; // Set HTML for other pages
+                    break;
+            }
+        }
+
+        // Initialize with dashboard content on load
+        window.onload = function() {
+            loadPage('dashboard');
+        };
+    </script>
+</body>
+</html>

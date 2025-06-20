@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Approve Appointments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Simple fade-in for page content */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Styles for the custom alert/message box */
+    .message-box {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+    .message-box.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .message-box.success {
+        background-color: #d1fae5; /* green-100 */
+        color: #065f46; /* green-900 */
+        border: 1px solid #34d399; /* green-400 */
+    }
+    .message-box.error {
+        background-color: #fee2e2; /* red-100 */
+        color: #991b1b; /* red-900 */
+        border: 1px solid #ef4444; /* red-400 */
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+
+  <div class="max-w-7xl mx-auto animate-fadeIn">
+    <!-- Header with Back Button and Title -->
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+      <a href="doctor_dashboard.html" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200 text-base font-medium group">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200">
+          <path fill-rule="evenodd" d="M10.793 2.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1-1.414 1.414L11 4.414V17a1 1 0 1 1-2 0V4.414L5.293 7.707a1 1 0 0 1-1.414-1.414l4-4a1 1 0 0 1 1.414 0Z" clip-rule="evenodd" />
+        </svg>
+        Back to Dashboard
+      </a>
+      <h2 class="text-3xl font-bold text-gray-800">Pending Appointments</h2>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="overflow-x-auto bg-white shadow-xl rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-blue-700 text-white">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-lg">ID</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider">Patient</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider">Doctor</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider">Specialization</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider">Date</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider">Time</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider rounded-tr-lg">Action</th>
+          </tr>
+        </thead>
+        <tbody id="appointmentsTable" class="bg-white divide-y divide-gray-100 text-gray-700 text-sm">
+          <!-- Appointments will be loaded here -->
+          <tr>
+              <td colspan="7" class="text-center py-4 text-gray-500">Loading appointments...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Custom Message Box -->
+    <div id="messageBox" class="message-box hidden">
+        <span id="messageIcon" class="mr-2"></span>
+        <span id="messageText"></span>
+    </div>
+
+  </div>
+
+  <script>
+    const token = localStorage.getItem("doctor_token");
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    };
+
+    const messageBox = document.getElementById("messageBox");
+    const messageText = document.getElementById("messageText");
+    const messageIcon = document.getElementById("messageIcon");
+
+    function showMessage(message, type) {
+        messageBox.className = 'message-box show';
+        messageBox.classList.add(type);
+        messageText.textContent = message;
+        if (type === 'success') {
+            messageIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.23a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" /></svg>`;
+        } else if (type === 'error') {
+            messageIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M9.401 3.003c1.155-1.723 3.495-1.723 4.65 0L19.5 11.25a3 3 0 0 1-2.828 4.227H7.328A3 3 0 0 1 4.5 11.25l4.901-8.247ZM12 9a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9.75A.75.75 0 0 1 12 9Zm0 6a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z" clip-rule="evenodd" /></svg>`;
+        }
+        setTimeout(() => {
+            messageBox.className = 'message-box hidden';
+        }, 3000); // Hide after 3 seconds
+    }
+
+    const formatDate = (dateStr) => {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    };
+
+    const loadAppointments = () => {
+      const tbody = document.getElementById("appointmentsTable");
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">Loading appointments...</td></tr>`; // Show loading state
+
+      fetch(`${BASE_URL}/api/doctor/pending`, { headers })
+        .then(res => {
+          if (res.status === 401) { // Unauthorized, session expired
+            throw new Error("Unauthorized. Please login again.");
+          }
+          return res.json();
+        })
+        .then(appointments => {
+          tbody.innerHTML = ""; // Clear loading state
+
+          if (appointments.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">No pending appointments found.</td></tr>`;
+            return;
+          }
+
+          appointments.forEach(app => {
+            const tr = document.createElement("tr");
+            tr.className = "hover:bg-gray-50 transition-colors duration-150"; // Hover effect for rows
+
+            const dateInfo = app.new_date
+              ? `${formatDate(app.date)} <br><span class="text-xs text-gray-500 italic">(Rescheduled to: ${formatDate(app.new_date)})</span>`
+              : formatDate(app.date);
+
+            tr.innerHTML = `
+              <td class="px-4 py-3 whitespace-nowrap">${app.appid}</td>
+              <td class="px-4 py-3 whitespace-nowrap">${app.patient_name}</td>
+              <td class="px-4 py-3 whitespace-nowrap">${app.doctor_name}</td>
+              <td class="px-4 py-3 whitespace-nowrap">${app.specialization}</td>
+              <td class="px-4 py-3 whitespace-nowrap">${dateInfo}</td>
+              <td class="px-4 py-3 whitespace-nowrap">${app.time}</td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <select class="status block px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500 text-sm">
+                    <option value="">Select Action</option>
+                    <option value="approved">Approve</option>
+                    <option value="rejected">Reject</option>
+                  </select>
+                  <input type="date" class="newDate hidden px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500 text-sm" />
+                  <button class="submitBtn bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1.5 rounded-md shadow-md hover:shadow-lg transition duration-200 ease-in-out">Submit</button>
+                </div>
+              </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            const select = tr.querySelector(".status");
+            const dateInput = tr.querySelector(".newDate");
+            const submitBtn = tr.querySelector(".submitBtn");
+
+            select.addEventListener("change", () => {
+              dateInput.classList.toggle("hidden", select.value !== "rejected");
+            });
+
+            submitBtn.addEventListener("click", () => {
+              const status = select.value;
+              const new_date = dateInput.value.trim(); // Can be an empty string if not rejected
+              const appid = app.appid;
+
+              if (!status) {
+                showMessage("Please select a status (Approve/Reject).", "error");
+                return;
+              }
+
+              if (status === "rejected" && !new_date) {
+                showMessage("Please select a new date for rejection.", "error");
+                return;
+              }
+
+              const body = JSON.stringify({ status, new_date });
+
+              fetch(`${BASE_URL}/api/doctor/update-status/${appid}`, {
+                method: "PUT",
+                headers,
+                body
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                    showMessage(data.message || "Appointment updated successfully!", "success");
+                    loadAppointments(); // Reload appointments to reflect changes
+                } else {
+                    showMessage(data.message || "Failed to update appointment.", "error");
+                }
+              })
+              .catch(err => {
+                console.error("Error:", err);
+                showMessage("Failed to update appointment due to a network error.", "error");
+              });
+            });
+          });
+        })
+        .catch(err => {
+          console.error("Fetch error:", err);
+          if (err.message === "Unauthorized. Please login again.") {
+            showMessage(err.message, "error");
+            localStorage.removeItem("doctor_token");
+            setTimeout(() => { window.location.href = "doctor_login.html"; }, 1500);
+          } else {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-500">Error loading appointments: ${err.message}.</td></tr>`;
+            showMessage("Error loading appointments. Please try again.", "error");
+          }
+        });
+    };
+
+    // Load appointments on page load
+    loadAppointments();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Bills</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start py-10">
+
+  <h1 class="text-3xl font-bold mb-6 text-blue-600">My Bills</h1>
+
+  <div id="billTableContainer" class="w-full max-w-5xl px-4">
+    <p>Loading...</p>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("patient_token");
+
+    if (!token) {
+      document.getElementById("billTableContainer").innerHTML = "<p class='text-red-600'>Please login to view your bills.</p>";
+    } else {
+      fetch(`${BASE_URL}/api/patient/bills`, {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Unauthorized or error fetching bills");
+        return response.json();
+      })
+      .then(bills => {
+        if (!Array.isArray(bills) || bills.length === 0) {
+          document.getElementById("billTableContainer").innerHTML = "<p class='text-gray-600'>No bills found.</p>";
+          return;
+        }
+
+        const tableHTML = `
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+              <thead class="bg-blue-600 text-white">
+                <tr>
+                  <th class="py-2 px-4 text-left">Bill ID</th>
+                  <th class="py-2 px-4 text-left">Doctor</th>
+                  <th class="py-2 px-4 text-left">Receptionist</th>
+                  <th class="py-2 px-4 text-left">Amount</th>
+                  <th class="py-2 px-4 text-left">Room Charge</th>
+                  <th class="py-2 px-4 text-left">Medicine Charge</th>
+                  <th class="py-2 px-4 text-left">Date</th>
+                  <th class="py-2 px-4 text-left">Time</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-700">
+                ${bills.map(bill => `
+                  <tr class="border-t">
+                    <td class="py-2 px-4">${bill.billid}</td>
+                    <td class="py-2 px-4">${bill.doctor_name || 'N/A'}</td>
+                    <td class="py-2 px-4">${bill.reception_name || 'N/A'}</td>
+                    <td class="py-2 px-4">₹${bill.amount}</td>
+                    <td class="py-2 px-4">₹${bill.room_charge}</td>
+                    <td class="py-2 px-4">₹${bill.medicine_charge}</td>
+                    <td class="py-2 px-4">${bill.bill_date}</td>
+                    <td class="py-2 px-4">${bill.bill_time}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        document.getElementById("billTableContainer").innerHTML = tableHTML;
+      })
+      .catch(err => {
+        console.error("Error fetching bills:", err);
+        document.getElementById("billTableContainer").innerHTML = "<p class='text-red-600'>Error loading bills. Please try again.</p>";
+      });
+    }
+  </script>
+</body>
+</html>

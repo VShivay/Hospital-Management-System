@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receptionist Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Simple fade-in for page content */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Staggered animation delays for cards */
+    .animate-delay-100 { animation-delay: 0.1s; }
+    .animate-delay-200 { animation-delay: 0.2s; }
+    .animate-delay-300 { animation-delay: 0.3s; }
+    .animate-delay-400 { animation-delay: 0.4s; }
+    .animate-delay-500 { animation-delay: 0.5s; }
+
+    /* Styles for the custom alert/message box */
+    .message-box {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+    .message-box.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .message-box.success {
+        background-color: #d1fae5; /* green-100 */
+        color: #065f46; /* green-900 */
+        border: 1px solid #34d399; /* green-400 */
+    }
+    .message-box.error {
+        background-color: #fee2e2; /* red-100 */
+        color: #991b1b; /* red-900 */
+        border: 1px solid #ef4444; /* red-400 */
+    }
+  </style>
+</head>
+<body class="bg-blue-50 min-h-screen p-4 sm:p-6 lg:p-8">
+
+  <div class="max-w-7xl mx-auto animate-fadeIn">
+    <h1 class="text-4xl font-extrabold mb-10 text-center text-blue-800 flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 mr-4 text-blue-500">
+        <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15Z" />
+        <path fill-rule="evenodd" d="M22.5 9.75v.75a3 3 0 01-3 3h-15a3 3 0 01-3-3V9.75h21ZM2.25 14.25v4.5a3 3 0 003 3h15a3 3 0 003-3v-4.5H2.25Z" clip-rule="evenodd" />
+      </svg>
+      Receptionist Dashboard
+    </h1>
+
+    <!-- User Details -->
+    <div id="userDetails" class="bg-white p-6 rounded-xl shadow-lg mb-10 border-l-4 border-blue-400 animate-fadeIn animate-delay-100">
+        <p class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-gray-500 mr-2">
+              <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0a4.5 4.5 0 01-9 0ZM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.001.001-.75.75 0 01-.445.445A8.254 8.254 0 0112 22.5a8.254 8.254 0 01-7.802-5.694.75.75 0 01-.445-.445.75.75 0 01-.001-.001Z" clip-rule="evenodd" />
+            </svg>
+            Welcome, <span id="receptionistName" class="text-blue-600 ml-1">Loading...</span>
+        </p>
+        <p class="text-gray-600 text-sm">Loading details...</p>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <!-- Assign Room -->
+      <a href="assign_room.html" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out flex items-center group animate-fadeIn animate-delay-200">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 text-blue-600 mr-6 group-hover:scale-110 transition-transform">
+          <path fill-rule="evenodd" d="M2.25 6a3 3 0 013-3h15a3 3 0 013 3v9a3 3 0 01-3 3h-15a3 3 0 01-3-3V6Zm3-1.5a.75.75 0 00-.75.75V15a.75.75 0 00.75.75h15a.75.75 0 00.75-.75V6a.75.75 0 00-.75-.75h-15ZM5.25 19.5h15.5a.75.75 0 000-1.5H5.25a.75.75 0 000 1.5Z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h2 class="text-xl font-semibold text-blue-800 mb-1">Assign Room</h2>
+          <p class="text-gray-600 text-sm">Assign patients to available rooms or view room status.</p>
+        </div>
+      </a>
+
+      <!-- View Assigned Room -->
+      <a href="assigned-room.html" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out flex items-center group animate-fadeIn animate-delay-300">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 text-green-600 mr-6 group-hover:rotate-6 transition-transform">
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.9 7.059 4.5 12 4.5c4.94 0 9.189 2.4 10.677 6.947A11.129 11.129 0 0 1 12 22.5a11.129 11.129 0 0 1-10.677-11.053ZM12 12.75a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h2 class="text-xl font-semibold text-green-800 mb-1">View Assigned Rooms</h2>
+          <p class="text-gray-600 text-sm">See the current occupancy and details of assigned rooms.</p>
+        </div>
+      </a>
+
+      <!-- View Patient Details -->
+      <a href="select-patient.html" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out flex items-center group animate-fadeIn animate-delay-400">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 text-purple-600 mr-6 group-hover:scale-110 transition-transform">
+          <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0a4.5 4.5 0 01-9 0ZM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.001.001-.75.75 0 01-.445.445A8.254 8.254 0 0112 22.5a8.254 8.254 0 01-7.802-5.694.75.75 0 01-.445-.445.75.75 0 01-.001-.001Z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h2 class="text-xl font-semibold text-purple-800 mb-1">Patient Details</h2>
+          <p class="text-gray-600 text-sm">Access and manage patient records, history, and information.</p>
+        </div>
+      </a>
+
+      <!-- Generate Bills -->
+      <a href="generate_bill.html" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out flex items-center group animate-fadeIn animate-delay-500">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 text-yellow-600 mr-6 group-hover:animate-bounce">
+          <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h2 class="text-xl font-semibold text-yellow-800 mb-1">Generate Bills</h2>
+          <p class="text-gray-600 text-sm">Create and print billing statements for patient services.</p>
+        </div>
+      </a>
+
+      <!-- Logout -->
+      <button onclick="logout()" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out flex items-center group animate-fadeIn animate-delay-600 w-full">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 text-red-600 mr-6 group-hover:rotate-12 transition-transform">
+          <path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 0 1.5 0v-1.5a.75.75 0 0 0-.75-.75H10.5a.75.75 0 0 1-.75-.75V10.5a.75.75 0 0 1 .75-.75h5.25a.75.75 0 0 0 .75-.75V7.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3h-.75A1.5 1.5 0 0 0 3 12.75v4.5A1.5 1.5 0 0 0 4.5 18H18a1.5 1.5 0 0 0 1.5-1.5V5.25A1.5 1.5 0 0 0 18 3.75h-9a1.5 1.5 0 0 0-1.5 1.5Z" clip-rule="evenodd" />
+          <path fill-rule="evenodd" d="M12.25 15.75a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06l-1.72 1.72V6.75a.75.75 0 0 0-1.5 0v7.69l-1.72-1.72a.75.75 0 0 0-1.06 1.06l3 3Z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h2 class="text-xl font-semibold text-red-800 mb-1">Logout</h2>
+          <p class="text-gray-600 text-sm">Securely end your current session.</p>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Message Box -->
+  <div id="messageBox" class="message-box hidden">
+      <span id="messageIcon" class="mr-2"></span>
+      <span id="messageText"></span>
+  </div>
+
+  <script>
+    const messageBox = document.getElementById("messageBox");
+    const messageText = document.getElementById("messageText");
+    const messageIcon = document.getElementById("messageIcon");
+    const receptionistNameSpan = document.getElementById("receptionistName");
+    const userDetailsDiv = document.getElementById("userDetails");
+
+    // Function to show custom messages
+    function showMessage(message, type) {
+        messageBox.className = 'message-box show'; // Reset classes, add 'show'
+        messageBox.classList.add(type);
+        messageText.textContent = message;
+        if (type === 'success') {
+            messageIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.23a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" /></svg>`;
+        } else if (type === 'error') {
+            messageIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M9.401 3.003c1.155-1.723 3.495-1.723 4.65 0L19.5 11.25a3 3 0 0 1-2.828 4.227H7.328A3 3 0 0 1 4.5 11.25l4.901-8.247ZM12 9a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9.75A.75.75 0 0 1 12 9Zm0 6a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z" clip-rule="evenodd" /></svg>`;
+        }
+        setTimeout(() => {
+            messageBox.className = 'message-box hidden'; // Hide after 3 seconds
+        }, 3000);
+    }
+
+    async function fetchDetails() {
+      // Corrected: Retrieve 'reception_token' from localStorage
+      const token = localStorage.getItem("token"); 
+
+      if (!token) {
+        showMessage("No session found. Please login.", "error");
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1500);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/reception/me`, {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+
+        const data = await res.json();
+        
+        if (res.ok) {
+          receptionistNameSpan.textContent = data.name || 'Receptionist';
+          userDetailsDiv.innerHTML = `
+            <p class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-gray-500 mr-2">
+                  <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0a4.5 4.5 0 01-9 0ZM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.001.001-.75.75 0 01-.445.445A8.254 8.254 0 0112 22.5a8.254 8.254 0 01-7.802-5.694.75.75 0 01-.445-.445.75.75 0 01-.001-.001Z" clip-rule="evenodd" />
+                </svg>
+                Welcome, <span class="text-blue-600 ml-1">${data.name || 'Receptionist'}</span>
+            </p>
+            <p class="mb-1"><strong class="text-gray-700">ID:</strong> ${data.reid}</p>
+            <p class="mb-1"><strong class="text-gray-700">Email:</strong> ${data.email}</p>
+            <p class="mb-1"><strong class="text-gray-700">Contact:</strong> ${data.number}</p>
+            <p><strong class="text-gray-700">Address:</strong> ${data.address}</p>
+          `;
+        } else {
+          // Handle specific HTTP errors
+          if (res.status === 403 || res.status === 401) {
+            showMessage(data.message || "Invalid or expired session. Redirecting to login...", "error");
+            localStorage.removeItem("reception_token"); // Clear incorrect token
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 2000);
+          } else {
+            showMessage(data.message || "An error occurred while fetching user details.", "error");
+            userDetailsDiv.innerHTML = `<p class="text-red-500">Error loading details: ${data.message || "Unknown error"}.</p>`;
+          }
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        showMessage("Server error. Could not fetch user details. Please try again later.", "error");
+        userDetailsDiv.innerHTML = `<p class="text-red-500">Could not connect to server. Please check your internet connection or try again later.</p>`;
+      }
+    }
+
+    function logout() {
+      // Clear the correct token
+      localStorage.removeItem("reception_token"); 
+      showMessage("Logged out successfully!", "success");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1000);
+    }
+
+    // Call fetchDetails on page load
+    fetchDetails();
+  </script>
+</body>
+</html>

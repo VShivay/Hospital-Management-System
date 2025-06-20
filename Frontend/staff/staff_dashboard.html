@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staff Dashboard</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-xl space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+        <i data-lucide="user-check" class="w-6 h-6 text-blue-600"></i> Staff Dashboard
+      </h2>
+      <button onclick="logout()" class="flex items-center gap-2 text-red-500 hover:underline text-sm">
+        <i data-lucide="log-out" class="w-5 h-5"></i> Logout
+      </button>
+    </div>
+
+    <div id="staffInfo" class="text-gray-700 space-y-2"></div>
+
+    <div class="flex flex-col gap-4 pt-4">
+      <a href="assigned-rooms.html" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+        <i data-lucide="eye" class="w-5 h-5 mr-2"></i> View Assigned Rooms
+      </a>
+      <a href="assigned-room.html" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+        <i data-lucide="history" class="w-5 h-5 mr-2"></i> View Past Assigned Rooms
+      </a>
+    </div>
+  </div>
+
+  <script>
+    async function loadStaff() {
+      const token = localStorage.getItem("staffToken");
+      if (!token) {
+        window.location.href = "/staff_login.html";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/staff/me`, {
+          headers: { Authorization: "Bearer " + token }
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById("staffInfo").innerHTML = `
+            <p><strong>ID:</strong> ${data.sid}</p>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Number:</strong> ${data.number}</p>
+            <p><strong>Address:</strong> ${data.address}</p>
+            <p><strong>Salary:</strong> $${data.salary}</p>
+          `;
+        } else {
+          document.getElementById("staffInfo").innerText = data.message;
+        }
+      } catch (error) {
+        document.getElementById("staffInfo").innerText = "Error loading staff info.";
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("staffToken");
+      window.location.href = "staff_login.html";
+    }
+
+    loadStaff();
+  </script>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

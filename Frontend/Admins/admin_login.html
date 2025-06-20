@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="../url.js"></script>
+  <title>Admin Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif; /* Using Inter font, a modern choice */
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+      padding: 2.5rem; /* Increased padding */
+      width: 100%;
+      max-width: 420px; /* Slightly wider card */
+      animation: fadeIn 0.5s ease-out; /* Add a fade-in animation */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Custom focus styles for inputs (Tailwind default is good but can be enhanced) */
+    .form-input:focus {
+      border-color: #6a11cb;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
+      outline: none;
+    }
+
+    .btn-primary {
+      background-color: #6a11cb;
+      border-color: #6a11cb;
+      transition: all 0.2s ease-in-out; /* Smooth transition for hover */
+    }
+
+    .btn-primary:hover {
+      background-color: #5311a8;
+      border-color: #5311a8;
+      transform: translateY(-2px); /* Slight lift on hover */
+    }
+
+    #message {
+      font-size: 0.9rem;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a id="dynamicLink" class="absolute top-6 left-6 text-white hover:text-gray-200 transition duration-300 text-sm font-medium flex items-center group">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 transition-transform duration-300 group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+    Back to Home
+  </a>
+
+  <div class="login-card">
+    <div class="text-center mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-indigo-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+      <h4 class="text-2xl font-bold text-gray-800">Admin Login</h4>
+      <p class="text-gray-500 text-sm mt-1">Access your administrative panel</p>
+    </div>
+    <form id="loginForm">
+      <div class="mb-4">
+        <label for="email" class="block text-gray-700 text-sm font-medium mb-2">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.5a2.5 2.5 0 01-2.5 2.5V12" />
+            </svg>
+            Email address
+          </div>
+        </label>
+        <input type="email" id="email" class="form-input mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-600 sm:text-sm" placeholder="your@example.com" required />
+      </div>
+      <div class="mb-6">
+        <label for="password" class="block text-gray-700 text-sm font-medium mb-2">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 1.656-1.343 3-3 3s-3-1.344-3-3V7a3 3 0 016 0v4zm-3 0v4m0 0a2 2 0 002 2h4a2 2 0 002-2v-4a2 2 0 00-2-2h-4a2 2 0 00-2 2z" />
+            </svg>
+            Password
+          </div>
+        </label>
+        <input type="password" id="password" class="form-input mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-600 sm:text-sm" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn-primary w-full py-2 px-4 rounded-md text-white font-semibold flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+        </svg>
+        Login
+      </button>
+    </form>
+    <div id="message" class="mt-4 text-center text-sm font-medium"></div>
+  </div>
+
+  <script>
+    document.getElementById("dynamicLink").href = `${BASE_URL}/a`;
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/admin/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem("admin_token", data.token);
+          message.innerHTML = `<span class="text-green-600 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Login successful! Redirecting...</span>`;
+          setTimeout(() => {
+            window.location.href = "admin_dashboard.html";
+          }, 1000);
+        } else {
+          message.innerHTML = `<span class="text-red-600 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2A9 9 0 111 10a9 9 0 0118 0z" /></svg> ${data.message}</span>`;
+        }
+      } catch (err) {
+        console.error(err);
+        message.innerHTML = `<span class="text-red-600 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Server error. Please try again later.</span>`;
+      }
+    });
+  </script>
+</body>
+</html>

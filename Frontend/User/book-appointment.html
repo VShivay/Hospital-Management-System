@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="../url.js"></script>
+    <meta charset="UTF-8" />
+    <title>Book Appointment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center px-4">
+
+    <div class="bg-white shadow-xl rounded-xl w-full max-w-md p-8">
+      <h2 class="text-2xl font-semibold text-center text-indigo-700 mb-6 flex items-center justify-center gap-2">
+        📋 Book an Appointment
+      </h2>
+
+      <form id="appointmentForm" class="space-y-4">
+        <div>
+          <label for="doctor" class="block font-semibold text-gray-700 mb-1">👨‍⚕️ Select Doctor</label>
+          <select
+            id="doctor"
+            required
+            class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          >
+            <option value="">Loading doctors...</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="date" class="block font-semibold text-gray-700 mb-1">📅 Date</label>
+          <input
+            type="date"
+            id="date"
+            required
+            class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+
+        <div>
+          <label for="time" class="block font-semibold text-gray-700 mb-1">⏰ Time</label>
+          <input
+            type="time"
+            id="time"
+            required
+            class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 text-white font-medium py-2 rounded-md hover:bg-indigo-700 transition"
+        >
+          Book Appointment
+        </button>
+
+        <div id="errorMsg" class="text-red-500 font-semibold text-sm text-center mt-2"></div>
+        <div id="successMsg" class="text-green-600 font-semibold text-sm text-center mt-2"></div>
+      </form>
+
+      <div class="text-center mt-6">
+        <a href="http://localhost:5000/" class="text-indigo-500 hover:underline text-sm">← Back to Home</a>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("patient_token");
+
+      if (!token) {
+        alert("You are not logged in. Redirecting to login...");
+        window.location.href = "patient_login.html";
+      }
+
+      const doctorSelect = document.getElementById("doctor");
+      const errorMsg = document.getElementById("errorMsg");
+      const successMsg = document.getElementById("successMsg");
+
+      // Load doctor options
+      fetch(`${BASE_URL}/api/patient/doctors`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load doctors.");
+          return res.json();
+        })
+        .then((doctors) => {
+          doctorSelect.innerHTML = '<option value="">Select a doctor</option>';
+          doctors.forEach((doc) => {
+            const option = document.createElement("option");
+            option.value = doc.did;
+            option.textContent = `${doc.name} - ${doc.specialization}`;
+            doctorSelect.appendChild(option);
+          });
+        })
+        .catch((err) => {
+          doctorSelect.innerHTML = '<option value="">Failed to load doctors</option>';
+          errorMsg.textContent = err.message;
+        });
+
+      // Handle form submission
+      document.getElementById("appointmentForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const did = doctorSelect.value;
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+
+        errorMsg.textContent = "";
+        successMsg.textContent = "";
+
+        if (!did || !date || !time) {
+          errorMsg.textContent = "Please fill in all fields.";
+          return;
+        }
+
+        fetch(`${BASE_URL}/api/patient/appointments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ did, date, time }),
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to book appointment");
+            return res.json();
+          })
+          .then(() => {
+            successMsg.textContent = "🎉 Appointment booked successfully!";
+            document.getElementById("appointmentForm").reset();
+          })
+          .catch((err) => {
+            errorMsg.textContent = err.message;
+          });
+      });
+    </script>
+  </body>
+</html>

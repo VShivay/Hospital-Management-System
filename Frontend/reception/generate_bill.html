@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generate Patient Bill</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #e0f2fe, #bbdefb); /* Light blue gradient */
+        }
+        .header-gradient {
+            background: linear-gradient(to right, #1e3a8a, #2563eb); /* Dark blue to blue gradient */
+        }
+        .card {
+            background-color: white;
+            border-radius: 1.5rem; /* rounded-3xl for a softer look */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+        }
+        .table-header-gradient {
+            background: linear-gradient(to right, #dbeafe, #93c5fd); /* Light blue gradient for table header */
+        }
+        .button-gradient {
+            background: linear-gradient(to right, #3b82f6, #2563eb); /* Blue-500 to Blue-700 */
+            transition: all 0.2s ease-in-out;
+        }
+        .button-gradient:hover {
+            background: linear-gradient(to right, #2563eb, #1d4ed8); /* Darker blue on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Message box styles */
+        #messageBox {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none; /* Hidden by default */
+            font-weight: 600;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #messageBox.success {
+            background-color: #d1fae5; /* Green-100 */
+            color: #065f46; /* Green-800 */
+        }
+        #messageBox.error {
+            background-color: #fee2e2; /* Red-100 */
+            color: #991b1b; /* Red-800 */
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="header-gradient text-white py-5 px-4 md:px-8 flex items-center justify-between rounded-b-xl shadow-md">
+        <h1 class="text-2xl md:text-3xl font-extrabold flex items-center gap-3">
+            <i class="ph ph-receipt text-3xl md:text-4xl"></i> Generate Patient Bill
+        </h1>
+    </header>
+
+    <main class="p-4 md:p-6 lg:p-8">
+        <!-- Message Box -->
+        <div id="messageBox" class="flex items-center gap-2">
+            <i id="messageIcon" class="text-xl"></i>
+            <span id="messageText"></span>
+        </div>
+
+        <div class="max-w-7xl mx-auto card p-6 md:p-8 space-y-8">
+
+            <!-- Select Appointment -->
+            <div>
+                <label for="appointment" class="block text-gray-800 font-semibold mb-3 text-lg">Select Unbilled Appointment:</label>
+                <div class="relative">
+                    <select id="appointment" class="appearance-none w-full p-4 pl-12 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base md:text-lg cursor-pointer">
+                        <option value="">-- Select Appointment --</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                        <i class="ph ph-clipboard-text text-xl"></i>
+                    </div>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
+                        <i class="ph ph-caret-down text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charge Details Table -->
+            <div id="chargeDetails" class="hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="ph ph-info text-blue-500"></i> Bill Details
+                </h2>
+                <table class="min-w-full bg-white rounded-xl overflow-hidden shadow-sm">
+                    <thead class="table-header-gradient text-blue-800 font-bold uppercase tracking-wider text-left">
+                        <tr>
+                            <th class="px-6 py-4 rounded-tl-xl">Description</th>
+                            <th class="px-6 py-4 text-right rounded-tr-xl">Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-gray-700">
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-3 flex items-center gap-3"><i class="ph ph-user-doctor text-blue-500 text-lg"></i> Doctor Fee</td>
+                            <td class="px-6 py-3 text-right" id="doctorFee"></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-3 flex items-center gap-3"><i class="ph ph-bed text-green-600 text-lg"></i> Room Charge</td>
+                            <td class="px-6 py-3 text-right" id="roomCharge"></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-3 flex items-center gap-3"><i class="ph ph-pill text-yellow-600 text-lg"></i> Medicine Charge</td>
+                            <td class="px-6 py-3 text-right" id="medicineCharge"></td>
+                        </tr>
+                        <tr class="bg-blue-50 font-extrabold text-blue-800">
+                            <td class="px-6 py-4 flex items-center gap-3 text-lg"><i class="ph ph-currency-circle-dollar text-2xl"></i> Total Amount</td>
+                            <td class="px-6 py-4 text-right text-lg" id="totalAmount"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="mt-8 flex justify-end">
+                    <button onclick="generateBill()" class="button-gradient text-white font-bold py-4 px-8 rounded-full shadow-lg text-lg flex items-center gap-3 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
+                        <i class="ph ph-check-circle text-2xl"></i> Generate Bill
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Placeholder for BASE_URL. In a real application, this would be dynamically set.
+        // For testing purposes, you might set it to a mock API endpoint or a development server.
+        const BASE_URL = "http://localhost:3000"; // Replace with your actual backend URL
+
+        // Function to show custom message box
+        function showMessage(message, type = 'success') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const messageIcon = document.getElementById('messageIcon');
+
+            messageBox.className = ''; // Clear existing classes
+            messageBox.classList.add(type);
+            messageText.textContent = message;
+
+            if (type === 'success') {
+                messageIcon.className = 'ph ph-check-circle';
+            } else if (type === 'error') {
+                messageIcon.className = 'ph ph-x-circle';
+            }
+
+            messageBox.style.display = 'flex';
+            messageBox.style.opacity = '1';
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                messageBox.style.opacity = '0';
+                setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 300); // Wait for fade out transition
+            }, 5000);
+        }
+
+        const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+        const appointmentSelect = document.getElementById('appointment');
+        const chargeDetailsSection = document.getElementById('chargeDetails'); // Renamed to avoid conflict with message div
+
+        let appointments = []; // Store fetched appointments
+
+        /**
+         * Fetches unbilled appointments from the API and populates the dropdown.
+         */
+        async function fetchUnbilledAppointments() {
+            try {
+                const res = await fetch(`${BASE_URL}/api/reception/unbilled-appointments`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to fetch unbilled appointments.");
+                }
+
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid data format received for appointments.");
+                }
+
+                appointments = data; // Store appointments globally
+                appointmentSelect.innerHTML = '<option value="">-- Select Appointment --</option>'; // Clear and add default option
+
+                if (appointments.length === 0) {
+                    const noAppointmentsOption = document.createElement('option');
+                    noAppointmentsOption.value = '';
+                    noAppointmentsOption.textContent = 'No unbilled appointments available';
+                    noAppointmentsOption.disabled = true;
+                    appointmentSelect.appendChild(noAppointmentsOption);
+                    showMessage('No unbilled appointments found.', 'success'); // Indicate no appointments
+                } else {
+                    appointments.forEach(app => {
+                        const option = document.createElement('option');
+                        option.value = app.appid;
+                        option.textContent = `${app.patient_name} with Dr. ${app.doctor_name} (AppID: ${app.appid})`;
+                        appointmentSelect.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error("Fetch unbilled appointments error:", err);
+                showMessage('Failed to load appointments: ' + err.message, 'error');
+            }
+        }
+
+        /**
+         * Event listener for appointment selection change.
+         * Populates bill details based on the selected appointment.
+         */
+        appointmentSelect.addEventListener('change', () => {
+            const appid = parseInt(appointmentSelect.value);
+
+            if (!appid) {
+                chargeDetailsSection.classList.add('hidden'); // Hide details if no appointment selected
+                return;
+            }
+
+            const selected = appointments.find(a => parseInt(a.appid) === appid);
+            if (!selected) {
+                chargeDetailsSection.classList.add('hidden');
+                showMessage('Selected appointment not found in data.', 'error');
+                return;
+            }
+
+            // Populate the charge details table
+            document.getElementById('doctorFee').textContent = Number(selected.fees || 0).toFixed(2);
+            document.getElementById('roomCharge').textContent = Number(selected.room_charge || 0).toFixed(2);
+            document.getElementById('medicineCharge').textContent = Number(selected.medicine_charge || 0).toFixed(2);
+            document.getElementById('totalAmount').textContent = Number(selected.total || 0).toFixed(2);
+
+            chargeDetailsSection.classList.remove('hidden'); // Show the details section
+            showMessage(''); // Clear any previous general message
+        });
+
+        /**
+         * Generates the bill for the selected appointment.
+         */
+        async function generateBill() {
+            const appid = parseInt(appointmentSelect.value);
+            if (!appid) {
+                showMessage('Please select an appointment to generate a bill.', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/reception/generate-bill`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ appid })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showMessage(`Bill generated successfully! (Bill ID: ${data.billid || 'N/A'})`, 'success');
+                    // Reset UI after successful bill generation
+                    chargeDetailsSection.classList.add('hidden');
+                    appointmentSelect.value = '';
+                    await fetchUnbilledAppointments(); // Reload unbilled appointments
+                } else {
+                    throw new Error(data.message || "Failed to generate bill.");
+                }
+            } catch (err) {
+                console.error("Generate bill error:", err);
+                showMessage('Error generating bill: ' + err.message, 'error');
+            }
+        }
+
+        // Fetch unbilled appointments when the page loads
+        document.addEventListener('DOMContentLoaded', fetchUnbilledAppointments);
+    </script>
+</body>
+</html>

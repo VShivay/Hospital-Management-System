@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Login</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #e0f2fe, #bbdefb); /* Light blue gradient */
+        }
+        .card {
+            background-color: white;
+            border-radius: 1.5rem; /* rounded-3xl for a softer look */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+        }
+        .button-gradient {
+            background: linear-gradient(to right, #6d28d9, #8b5cf6); /* Violet-700 to Violet-500 */
+            transition: all 0.2s ease-in-out;
+        }
+        .button-gradient:hover {
+            background: linear-gradient(to right, #8b5cf6, #a78bfa); /* Lighter violet on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Message box styles */
+        #messageBox {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none; /* Hidden by default */
+            font-weight: 600;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #messageBox.success {
+            background-color: #d1fae5; /* Green-100 */
+            color: #065f46; /* Green-800 */
+        }
+        #messageBox.error {
+            background-color: #fee2e2; /* Red-100 */
+            color: #991b1b; /* Red-800 */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-6 lg:p-8">
+    <!-- Placeholder for BASE_URL. In a real application, this would be dynamically set. -->
+    
+    <!-- Home Link -->
+    <a id="dynamicLink" class="absolute top-6 left-6 text-blue-700 hover:text-blue-900 font-semibold transition-colors duration-200 flex items-center gap-1">
+        <i class="ph ph-arrow-left text-xl"></i> Back to Home
+    </a>
+
+    <!-- Message Box -->
+    <div id="messageBox" class="flex items-center gap-2">
+        <i id="messageIcon" class="text-xl"></i>
+        <span id="messageText"></span>
+    </div>
+
+    <!-- Login Form Container -->
+    <div class="w-full max-w-md card p-6 md:p-8 text-center">
+        <h2 class="text-3xl font-extrabold text-gray-800 mb-6 flex items-center justify-center gap-3">
+            <i class="ph ph-user text-purple-600 text-4xl"></i> Patient Login
+        </h2>
+
+        <form id="loginForm" class="space-y-6">
+            <!-- Email -->
+            <div class="relative">
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                    class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
+                />
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                    <i class="ph ph-envelope-simple text-xl"></i>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="relative">
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    required
+                    class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
+                />
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                    <i class="ph ph-lock-key text-xl"></i>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button
+                type="submit"
+                class="w-full button-gradient text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg flex items-center justify-center gap-2 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl"
+            >
+                <i class="ph ph-sign-in text-xl"></i> Login
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Function to show custom message box (reused from previous designs)
+        function showMessage(message, type = 'success') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const messageIcon = document.getElementById('messageIcon');
+
+            messageBox.className = ''; // Clear existing classes
+            messageBox.classList.add(type);
+            messageText.textContent = message;
+
+            if (type === 'success') {
+                messageIcon.className = 'ph ph-check-circle';
+            } else if (type === 'error') {
+                messageIcon.className = 'ph ph-x-circle';
+            }
+
+            messageBox.style.display = 'flex';
+            messageBox.style.opacity = '1';
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                messageBox.style.opacity = '0';
+                setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 300); // Wait for fade out transition
+            }, 5000);
+        }
+
+        // Set the dynamic link for "Back to Home"
+        document.getElementById("dynamicLink").href = `${BASE_URL}/`;
+
+        const form = document.getElementById("loginForm");
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault(); // Prevent default form submission
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/patient/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await res.json(); // Parse the response body
+
+                if (res.ok) {
+                    localStorage.setItem("patient_token", data.token); // Store token
+                    // Redirect to patient dashboard on successful login
+                    window.location.href = "patient_dashboard.html";
+                } else {
+                    // Show error message using the custom message box
+                    showMessage(data.message || "Login failed. Please check your credentials.", 'error');
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                // Show generic network error message
+                showMessage("Network error. Please check your connection and try again.", 'error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8">
+  <title>View Appointments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .back-btn {
+      background-color: #3498db;
+      border: none;
+      padding: 8px 16px;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .container {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Appointments</h1>
+  <button class="back-btn" onclick="window.location.href='admin_dashboard.html'">Back</button>
+</header>
+
+<div class="container">
+  <h2>All Appointments</h2>
+
+  <table id="appointmentsTable">
+    <thead>
+      <tr>
+        <th>Appointment ID</th>
+        <th>Patient</th>
+        <th>Doctor</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>Rescheduled Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+  async function loadAppointments() {
+    const token = localStorage.getItem("admin_token");
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/admin/appointments`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch appointments");
+
+      const appointments = await res.json();
+      const tbody = document.querySelector("#appointmentsTable tbody");
+      tbody.innerHTML = "";
+
+      if (appointments.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='7'>No appointments found.</td></tr>";
+        return;
+      }
+
+      appointments.forEach(a => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${a.appid}</td>
+          <td>${a.patient_name}</td>
+          <td>${a.doctor_name}</td>
+          <td>${a.date}</td>
+          <td>${a.time}</td>
+          <td>${a.status}</td>
+          <td>${a.new_date ? a.new_date : "-"}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+    } catch (err) {
+      alert("Error loading appointments: " + err.message);
+      console.error(err);
+    }
+  }
+
+  window.onload = loadAppointments;
+</script>
+
+</body>
+</html>

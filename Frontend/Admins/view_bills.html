@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8">
+  <title>View Bills</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .back-btn {
+      background-color: #3498db;
+      border: none;
+      padding: 8px 16px;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .container {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .filter-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    input[type="date"] {
+      padding: 10px;
+      font-size: 16px;
+      margin-right: 1rem;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>View Bills</h1>
+  <button class="back-btn" onclick="window.location.href='admin_dashboard.html'">Back</button>
+</header>
+
+<div class="container">
+  <h2>Filter by Bill Date</h2>
+
+  <div class="filter-section">
+    <input type="date" id="billDate" />
+    <button onclick="loadBills()">Filter</button>
+  </div>
+
+  <table id="billsTable">
+    <thead>
+      <tr>
+        <th>Bill ID</th>
+        <th>Patient</th>
+        <th>Doctor</th>
+        <th>Receptionist</th>
+        <th>Amount</th>
+        <th>Room Charge</th>
+        <th>Medicine Charge</th>
+        <th>Bill Date</th>
+        <th>Bill Time</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+  async function loadBills() {
+    const token = localStorage.getItem("admin_token");
+    const billDate = document.getElementById("billDate").value;
+    const url = billDate 
+      ? `${BASE_URL}/api/admin/bills?bill_date=${billDate}` 
+      : `${BASE_URL}/api/admin/bills`;
+
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch bills");
+
+      const bills = await res.json();
+      const tbody = document.querySelector("#billsTable tbody");
+      tbody.innerHTML = "";
+
+      if (bills.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='9'>No bills found for selected date.</td></tr>";
+        return;
+      }
+
+      bills.forEach(bill => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${bill.billid}</td>
+          <td>${bill.patient_name}</td>
+          <td>${bill.doctor_name}</td>
+          <td>${bill.receptionist_name}</td>
+          <td>${bill.amount}</td>
+          <td>${bill.room_charge}</td>
+          <td>${bill.medicine_charge}</td>
+          <td>${bill.bill_date}</td>
+          <td>${bill.bill_time}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+    } catch (err) {
+      alert("Error loading bills: " + err.message);
+      console.error(err);
+    }
+  }
+
+  // Load all bills on page load
+  window.onload = loadBills;
+</script>
+
+</body>
+</html>

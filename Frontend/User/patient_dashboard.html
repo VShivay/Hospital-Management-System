@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="../url.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* Optional: Custom scrollbar styles if needed for a super polished look */
+      /* ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      } */
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen p-6 font-sans antialiased"
+  >
+    <header
+      class="flex flex-col md:flex-row justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-lg"
+    >
+      <h1 class="text-4xl font-extrabold text-gray-800 mb-4 md:mb-0">
+        <i class="fas fa-hand-holding-medical text-blue-600 mr-3"></i> Welcome,
+        <span id="userName" class="text-blue-700">Loading...</span>
+      </h1>
+      <button
+        id="logoutBtn"
+        class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+      >
+        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+      </button>
+    </header>
+
+    <div
+      class="bg-white shadow-xl rounded-xl p-6 mb-10 border-l-4 border-blue-500"
+    >
+      <h2 class="text-2xl font-bold text-gray-700 mb-3 flex items-center">
+        <i class="fas fa-history text-blue-500 mr-3"></i> Last Visit
+      </h2>
+      <p id="visitInfo" class="text-gray-600 text-lg">Loading...</p>
+    </div>
+
+    <div
+      class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+    >
+      <div
+        class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 cursor-pointer text-center border-b-4 border-transparent hover:border-blue-500"
+        onclick="location.href='book-appointment.html'"
+      >
+        <div class="text-6xl text-blue-500 mb-4 transition-transform duration-300 group-hover:scale-110">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-700 mb-2">Book Appointment</h3>
+        <p class="text-gray-600 text-sm">Schedule your next visit with ease.</p>
+      </div>
+
+      <div
+        class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 cursor-pointer text-center border-b-4 border-transparent hover:border-purple-500"
+        onclick="location.href='booked_appointments.html'"
+      >
+        <div class="text-6xl text-purple-500 mb-4 transition-transform duration-300 group-hover:scale-110">
+          <i class="fas fa-clipboard-list"></i>
+        </div>
+        <h3 class="text-xl font-bold text-purple-700 mb-2">View Appointments</h3>
+        <p class="text-gray-600 text-sm">Check your upcoming and past appointments.</p>
+      </div>
+
+      <div
+        class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 cursor-pointer text-center border-b-4 border-transparent hover:border-green-500"
+        onclick="location.href='prescriptions.html'"
+      >
+        <div class="text-6xl text-green-500 mb-4 transition-transform duration-300 group-hover:scale-110">
+          <i class="fas fa-prescription-bottle-alt"></i>
+        </div>
+        <h3 class="text-xl font-bold text-green-700 mb-2">View Prescriptions</h3>
+        <p class="text-gray-600 text-sm">Review medicines prescribed during visits.</p>
+      </div>
+
+      <div
+        class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 cursor-pointer text-center border-b-4 border-transparent hover:border-yellow-500"
+        onclick="location.href='bills.html'"
+      >
+        <div class="text-6xl text-yellow-500 mb-4 transition-transform duration-300 group-hover:scale-110">
+          <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <h3 class="text-xl font-bold text-yellow-700 mb-2">View Bills</h3>
+        <p class="text-gray-600 text-sm">Access all your medical billing history.</p>
+      </div>
+    </div>
+
+    <script>
+      // Make sure BASE_URL is defined in ../url.js or directly here if not
+      // const BASE_URL = 'http://localhost:3000'; // Example
+
+      const token = localStorage.getItem("patient_token"); // Ensure this matches your login.js setting
+
+      // Redirect to login if no token
+      if (!token) {
+        window.location.href = "patient_login.html";
+      }
+
+      // Fetch User Info
+      fetch(`${BASE_URL}/api/patient/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => {
+          if (!res.ok) {
+            // If response is not OK, it likely means token is invalid or expired
+            if (res.status === 401 || res.status === 403) {
+              throw new Error("Session expired. Please login again.");
+            }
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          document.getElementById("userName").textContent = data.name;
+        })
+        .catch((error) => {
+          console.error("Error fetching user info:", error);
+          alert(error.message || "Failed to load user data. Please login again.");
+          localStorage.removeItem("patient_token"); // Remove invalid token
+          window.location.href = "patient_login.html";
+        });
+
+      // Fetch Last Visit
+      fetch(`${BASE_URL}/api/patient/last-visit`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.date && data.time) {
+            const visitDate = new Date(data.date).toLocaleDateString("en-IN", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }); // Formats for Indian locale
+
+            // Correctly parse and format time for 12-hour format with AM/PM
+            const [hour, minute] = data.time.split(":");
+            const dateObj = new Date();
+            dateObj.setHours(parseInt(hour, 10));
+            dateObj.setMinutes(parseInt(minute, 10));
+            const formattedTime = dateObj.toLocaleTimeString("en-IN", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            });
+
+            document.getElementById("visitInfo").textContent =
+              `Dr. ${data.doctor_name} on ${visitDate} at ${formattedTime}.`;
+          } else {
+            document.getElementById("visitInfo").textContent =
+              "No recent visits recorded.";
+          }
+        })
+        .catch((error) => {
+          console.error("Error loading last visit:", error);
+          document.getElementById("visitInfo").textContent =
+            "Error loading visit information.";
+        });
+
+      // Logout Logic
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to logout?")) {
+          localStorage.removeItem("patient_Token"); // Ensure this matches your login.js setting
+          window.location.href = "patient_login.html";
+        }
+      });
+    </script>
+  </body>
+</html>

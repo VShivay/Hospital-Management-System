@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Receptionist Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Simple fade-in for the card */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+  <a id="dynamicLink" class="absolute top-6 left-6 text-blue-600 hover:text-blue-800 transition-colors duration-200 text-sm font-medium flex items-center group">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 mr-1 group-hover:-translate-x-0.5 transition-transform duration-200">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h17.25" />
+    </svg>
+    Back to Home
+  </a>
+
+  <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm border border-gray-200 animate-fadeIn">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8 flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-blue-500 mr-3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.75a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 14.25V21m12.75-3.034V21M12 21h4.5m-4.5 0v-3.562c0-.899.199-1.78.54-2.594m-3.868 2.035L11.25 4.5l-2.269 9.318 4.472 4.472A3.5 3.5 0 0 0 16.5 18V9.254a3.5 3.5 0 0 0-5.068-3.328 3.5 3.5 0 0 0-2.134 3.014V17.25m2.25-4.5l4 4m0 0l4-4m-4 4V4.75m2.25 2.25v2.75m-2.25-2.75h-.75V11.25m2.25 2.25v-.75m-2.25-.75h-.75" />
+      </svg>
+      Reception Login
+    </h2>
+
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label for="email" class="sr-only">Email</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25H5.25a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5H4.5A2.25 2.25 0 0 0 2.25 6.75m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+            </svg>
+          </div>
+          <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            required
+            autocomplete="email"
+            class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-gray-700 placeholder-gray-400"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="password" class="sr-only">Password</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v4.5m11.25 0H9" />
+            </svg>
+          </div>
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+            autocomplete="current-password"
+            class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-gray-700 placeholder-gray-400"
+          />
+          <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200" aria-label="Toggle password visibility">
+            <svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        id="loginBtn"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md hover:shadow-lg flex justify-center items-center"
+      >
+        <span id="loginText">Login</span>
+        <svg id="spinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
+    </form>
+
+    <div id="message" class="text-center text-sm mt-5 font-medium"></div>
+  </div>
+
+  <script>
+    document.getElementById("dynamicLink").href = `${BASE_URL}/hospital`;
+
+    function togglePassword() {
+      const pwd = document.getElementById("password");
+      const toggleIcon = document.getElementById("toggleIcon");
+      if (pwd.type === "password") {
+        pwd.type = "text";
+        toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.988 5.862a1.01 1.01 0 0 0-.655 1.114l.515 2.06a1 1 0 0 0 .783.714l2.457.262a1 1 0 0 0 .788-.415L11.5 3.5m0 0l-5.6 5.6m5.6-5.6a9.95 9.95 0 0 1 5.927 2.115l.555.334m-2.096 1.48a1.002 1.002 0 0 0-.67-.348l-2.457-.262a1 1 0 0 0-.788.415L12.5 13.5m0 0l5.6-5.6m-5.6 5.6a9.95 9.95 0 0 0-5.927-2.115l-.555-.334"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c-1.372-2.012-3.693-4.5-9-4.5S4.372 9.988 3 12m18 0c-1.372 2.012-3.693 4.5-9 4.5S4.372 14.012 3 12"></path>`; // Eye-slash icon
+      } else {
+        pwd.type = "password";
+        toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />`; // Eye icon
+      }
+    }
+
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginText = document.getElementById("loginText");
+    const spinner = document.getElementById("spinner");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      message.textContent = ""; // Clear previous messages
+      message.classList.remove("text-red-500", "text-green-600"); // Reset message color
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        message.classList.add("text-red-500");
+        message.textContent = "Please enter both email and password.";
+        return;
+      }
+
+      // Show spinner and disable button
+      loginText.textContent = "Logging in...";
+      spinner.classList.remove("hidden");
+      loginBtn.disabled = true;
+      loginBtn.classList.add("opacity-75", "cursor-not-allowed");
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/reception/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+
+        // Hide spinner and re-enable button
+        loginText.textContent = "Login";
+        spinner.classList.add("hidden");
+        loginBtn.disabled = false;
+        loginBtn.classList.remove("opacity-75", "cursor-not-allowed");
+
+        if (res.ok) {
+          message.classList.add("text-green-600");
+          message.textContent = "Login successful! Redirecting...";
+          localStorage.setItem("token", data.token); // Store as 'reception_token' for clarity
+          // Give a brief moment for the user to see the success message
+          
+            window.location.href = "dashboard.html";
+          
+        } else {
+          message.classList.add("text-red-500");
+          message.textContent = data.message || "Login failed. Please check your credentials.";
+        }
+      } catch (err) {
+        // Hide spinner and re-enable button
+        spinner.classList.add("hidden");
+        loginText.textContent = "Login";
+        loginBtn.disabled = false;
+        loginBtn.classList.remove("opacity-75", "cursor-not-allowed");
+
+        console.error("Login error:", err);
+        message.classList.add("text-red-500");
+        message.textContent = "Network error. Please try again later.";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../url.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Custom CSS for animations and specific overrides if needed */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3); /* Light blue gradient */
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative; /* For absolute positioning of back link */
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .login-card {
+      animation: fadeInScale 0.5s ease-out forwards;
+    }
+
+    /* Custom focus styles for inputs (Tailwind's default is good, but can be enhanced for branding) */
+    .form-input:focus {
+      border-color: #3b82f6; /* Blue-500 from Tailwind */
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* Blue-500 with opacity */
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <a id="dynamicLink" class="absolute top-6 left-6 text-blue-700 hover:text-blue-900 transition duration-200 text-sm font-medium flex items-center group">
+    <i class="fas fa-arrow-left mr-2 transition-transform duration-200 group-hover:-translate-x-1"></i>
+    Back to Home
+  </a>
+
+  <div class="login-card bg-white p-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md">
+    <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center flex items-center justify-center">
+      <i class="fas fa-user-md text-blue-600 mr-3 text-4xl"></i> Doctor Login
+    </h2>
+
+    <form id="doctorLoginForm">
+      <div class="mb-5 relative">
+        <i class="fas fa-envelope text-blue-500 absolute left-4 top-1/2 -translate-y-1/2"></i>
+        <input
+          type="email"
+          id="email"
+          placeholder="Email address"
+          required
+          class="form-input w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 text-base"
+        />
+      </div>
+
+      <div class="mb-6 relative">
+        <i class="fas fa-lock text-blue-500 absolute left-4 top-1/2 -translate-y-1/2"></i>
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          required
+          class="form-input w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 text-base"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-lg flex items-center justify-center"
+      >
+        <i class="fas fa-sign-in-alt mr-2"></i> Login
+      </button>
+    </form>
+
+    <div id="message" class="mt-6 text-center text-sm font-medium"></div>
+
+    <div class="mt-6 text-center text-sm text-gray-600">
+      Need help? <a href="#" class="text-blue-600 hover:underline">Contact Support</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("dynamicLink").href = `${BASE_URL}/hospital`;
+
+    const form = document.getElementById("doctorLoginForm");
+    const messageDiv = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/doctor/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) { // Check if the response status is 2xx
+          localStorage.setItem("doctor_token", data.token);
+          messageDiv.innerHTML = `<span class="text-green-600 flex items-center justify-center"><i class="fas fa-check-circle mr-2"></i> Login successful! Redirecting...</span>`;
+          setTimeout(() => {
+            window.location.href = "doctor_dashboard.html";
+          }, 1000);
+        } else {
+          messageDiv.innerHTML = `<span class="text-red-600 flex items-center justify-center"><i class="fas fa-times-circle mr-2"></i> ${data.message || "Login failed"}</span>`;
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        messageDiv.innerHTML = `<span class="text-red-600 flex items-center justify-center"><i class="fas fa-exclamation-triangle mr-2"></i> Server error. Please try again later.</span>`;
+      }
+    });
+  </script>
+</body>
+</html>

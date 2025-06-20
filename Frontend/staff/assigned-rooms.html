@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assigned Rooms - Staff Panel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 30px;
+      background-color: #f4f6f8;
+      margin: 0;
+    }
+
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .room-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .room-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s;
+    }
+
+    .room-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .section-title {
+      font-weight: bold;
+      color: #34495e;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+
+    .info-item {
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    .loading,
+    .error {
+      text-align: center;
+      font-size: 1rem;
+      color: #777;
+    }
+
+    .error {
+      color: #e74c3c;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Assigned Rooms</h1>
+  <div id="room-container" class="room-container">
+    <p class="loading">Loading assigned rooms...</p>
+  </div>
+
+  <script>
+    async function fetchAssignedRooms() {
+      const token = localStorage.getItem("staffToken");
+      const container = document.getElementById("room-container");
+      container.innerHTML = "";
+
+      if (!token) {
+        container.innerHTML = "<p class='error'>Staff token not found. Please log in.</p>";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${BASE_URL}/api/staff/assigned-rooms`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch assigned rooms");
+        }
+
+        const data = await response.json();
+        const rooms = data.assignedRooms || data.rooms; // for compatibility
+
+        if (!rooms || rooms.length === 0) {
+          container.innerHTML = "<p class='loading'>No rooms assigned currently.</p>";
+          return;
+        }
+
+        rooms.forEach(room => {
+          const roomCard = document.createElement("div");
+          roomCard.className = "room-card";
+
+          roomCard.innerHTML = `
+            <div class="section-title">Room #${room.room_number}</div>
+            <div class="info-item">Class: ${room.class_name}</div>
+            <div class="info-item">Charge: ₹${room.charge}</div>
+
+            <div class="section-title">Patient Info</div>
+            <div class="info-item">Name: ${room.patient_name || "None"}</div>
+            <div class="info-item">Email: ${room.patient_email || "-"}</div>
+
+            <div class="section-title">Doctor Info</div>
+            <div class="info-item">Name: ${room.doctor_name || "Not Assigned"}</div>
+            <div class="info-item">Specialization: ${room.specialization || "-"}</div>
+
+            <div class="section-title">Appointment</div>
+            <div class="info-item">Date: ${room.appointment_date || "-"}</div>
+            <div class="info-item">Time: ${room.appointment_time || "-"}</div>
+          `;
+
+          container.appendChild(roomCard);
+        });
+
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p class='error'>Error fetching room data.</p>";
+      }
+    }
+
+    window.onload = fetchAssignedRooms;
+  </script>
+
+</body>
+</html>

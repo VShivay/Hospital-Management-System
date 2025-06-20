@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8">
+  <title>Add Doctor</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .back-btn {
+      background-color: #3498db;
+      border: none;
+      padding: 8px 16px;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 2rem auto;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      margin-bottom: 1rem;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Add Doctor</h1>
+    <button class="back-btn" onclick="window.location.href='admin_dashboard.html'">Back to Dashboard</button>
+  </header>
+
+  <div class="container">
+    <h2>Doctor Details</h2>
+    <form id="addDoctorForm">
+      <input type="text" name="name" placeholder="Doctor's Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="number" placeholder="Phone Number" required>
+      <input type="text" name="address" placeholder="Address" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="number" name="fees" placeholder="Consultation Fees" required>
+      <input type="text" name="specialization" placeholder="specialization" required>
+      <button type="submit">Add Doctor</button>
+    </form>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('addDoctorForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      try {
+        const token = localStorage.getItem("admin_token"); // assuming token is stored on login
+        const res = await fetch(`${BASE_URL}/api/admin/doctors`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        messageDiv.textContent = result.message;
+
+        if (res.ok) {
+          form.reset();
+          messageDiv.style.color = 'green';
+        } else {
+          messageDiv.style.color = 'red';
+        }
+      } catch (err) {
+        messageDiv.textContent = 'Error: Could not add doctor.';
+        messageDiv.style.color = 'red';
+        console.error(err);
+      }
+    });
+  </script>
+
+</body>
+</html>

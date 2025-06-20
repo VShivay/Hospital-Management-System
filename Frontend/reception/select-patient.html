@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8" />
+  <title>Select Patient</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+
+  <div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Select a Patient</h2>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto border border-gray-300">
+        <thead class="bg-blue-600 text-white">
+          <tr>
+            <th class="px-4 py-2 text-left">Patient Name</th>
+            <th class="px-4 py-2 text-left">Appointment Date</th>
+            <th class="px-4 py-2 text-left">Doctor</th>
+            <th class="px-4 py-2 text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody id="patient-table-body" class="bg-white divide-y divide-gray-200">
+          <!-- Rows will be injected here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function formatDate(isoDate) {
+      if (!isoDate) return '-';
+      const date = new Date(isoDate);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    async function fetchPatients() {
+      try {
+        const res = await fetch(`${BASE_URL}/api/reception/patients`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+
+        const patients = await res.json();
+
+        for (const patient of patients) {
+          const appRes = await fetch(`${BASE_URL}/api/reception/patient-appointments/${patient.pid}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          });
+
+          const appointments = await appRes.json();
+          const approvedApp = appointments.find(app => app.status === "approved");
+
+          if (approvedApp) {
+            const row = document.createElement("tr");
+            row.className = "hover:bg-gray-100 transition";
+            row.innerHTML = `
+              <td class="px-4 py-2">${patient.name}</td>
+              <td class="px-4 py-2">${formatDate(approvedApp.date)}</td>
+              <td class="px-4 py-2">${approvedApp.doctor_name || '-'}</td>
+              <td class="px-4 py-2">
+                <button onclick="viewDetails(${patient.pid})" class="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1 rounded">
+                  View All
+                </button>
+              </td>
+            `;
+            document.getElementById("patient-table-body").appendChild(row);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching patients:", err);
+      }
+    }
+
+    function viewDetails(pid) {
+      sessionStorage.setItem("selectedPatientId", pid);
+      window.location.href = "view-all.html";
+    }
+
+    fetchPatients();
+  </script>
+
+</body>
+</html>

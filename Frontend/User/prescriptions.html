@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8">
+  <title>My Prescriptions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f8;
+      padding: 2rem;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background-color: #f5f5f5;
+    }
+
+    tr:hover {
+      background-color: #f0f8ff;
+      cursor: pointer;
+    }
+
+    .prescription-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 4px 0;
+    }
+
+    #logoutBtn {
+      margin-top: 30px;
+      background-color: #ff4d4f;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #logoutBtn:hover {
+      background-color: #d9363e;
+    }
+
+    .info-label {
+      font-weight: bold;
+    }
+
+    #prescriptionTitle {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Completed Appointments</h2>
+
+  <table id="appointmentsTable">
+    <thead>
+      <tr>
+        <th>Appointment ID</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Doctor</th>
+        <th>Status</th>
+        <th>Visited</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="6">Loading...</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="prescriptionTitle">Prescriptions</h2>
+  <div class="prescription-container" id="prescriptionList"></div>
+
+  <button id="logoutBtn">Logout</button>
+
+  <script>
+  const token = localStorage.getItem("patient_token");
+  const tableBody = document.querySelector("#appointmentsTable tbody");
+  const prescriptionList = document.getElementById("prescriptionList");
+  const prescriptionTitle = document.getElementById("prescriptionTitle");
+
+  if (!token) {
+    alert("Please log in.");
+    window.location.href = "patient_login.html";
+  }
+
+  let appointments = [];
+
+  // Function to format ISO date string
+  function formatDateOnly(isoDateStr) {
+    const date = new Date(isoDateStr);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  // Fetch appointments
+  fetch(`${BASE_URL}/api/patient/appointments`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    appointments = data.filter(app => app.visited === "yes");
+    if (appointments.length === 0) {
+      tableBody.innerHTML = "<tr><td colspan='6'>No completed appointments found.</td></tr>";
+      return;
+    }
+
+    tableBody.innerHTML = "";
+
+    appointments.forEach(app => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${app.appid}</td>
+        <td>${formatDateOnly(app.date)}</td>
+        <td>${app.time}</td>
+        <td>Dr. ${app.doctor_name}</td>
+        <td>${app.status}</td>
+        <td>${app.visited}</td>
+      `;
+      row.addEventListener("click", () => loadPrescriptions(app.appid));
+      tableBody.appendChild(row);
+    });
+  });
+
+  // Load prescriptions for selected appointment
+  function loadPrescriptions(appid) {
+    prescriptionList.innerHTML = "<p>Loading...</p>";
+
+    fetch(`${BASE_URL}/api/patient/prescriptions/${appid}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      prescriptionList.innerHTML = "";
+      if (!data.length) {
+        prescriptionList.innerHTML = "<p>No prescriptions found for this appointment.</p>";
+        return;
+      }
+
+      data.forEach(pres => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>Medicine: ${pres.medicine_name}</h3>
+          <p><span class="info-label">Doctor:</span> Dr. ${pres.doctor_name}</p>
+          <p><span class="info-label">Instructions:</span> ${pres.instructions || pres.notes || "No specific instructions"}</p>
+        `;
+        prescriptionList.appendChild(card);
+      });
+    });
+  }
+
+  // Logout
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("patient_token");
+    window.location.href = "patient_login.html";
+  });
+</script>
+
+
+</body>
+</html>

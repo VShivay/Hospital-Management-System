@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../url.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctors List</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+
+  <div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md border border-gray-300">
+    <h1 class="text-3xl font-serif font-bold text-center text-gray-800 mb-4">Doctors List</h1>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse border border-gray-400 bg-white">
+        <thead class="bg-gray-300">
+          <tr>
+            <th class="border border-gray-400 px-4 py-2 text-left font-medium text-gray-700">Name</th>
+            <th class="border border-gray-400 px-4 py-2 text-left font-medium text-gray-700">Phone</th>
+            <th class="border border-gray-400 px-4 py-2 text-left font-medium text-gray-700">Email</th>
+            <th class="border border-gray-400 px-4 py-2 text-left font-medium text-gray-700">Fees (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="doctorList"></tbody>
+      </table>
+    </div>
+
+    <!-- Back Button -->
+    <div class="mt-6 text-center">
+      <button onclick="window.location.href='admin_dashboard.html'"
+        class="px-6 py-2 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-800">
+        Back
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("admin_token");
+
+    fetch(`${BASE_URL}/api/admin/getdoctors`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Unauthorized or Error fetching data");
+      return res.json();
+    })
+    .then(data => {
+      const list = document.getElementById("doctorList");
+      data.forEach(doc => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="border border-gray-400 px-4 py-2 text-gray-800">Dr. ${doc.name}</td>
+          <td class="border border-gray-400 px-4 py-2 text-gray-800">${doc.number}</td>
+          <td class="border border-gray-400 px-4 py-2 text-gray-800">${doc.email}</td>
+          <td class="border border-gray-400 px-4 py-2 text-gray-800 font-semibold">₹${doc.fees}</td>
+        `;
+        list.appendChild(row);
+      });
+    })
+    .catch(err => alert(err.message));
+  </script>
+
+</body>
+</html>

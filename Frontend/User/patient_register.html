@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="../url.js"></script>
+    <meta charset="UTF-8" />
+    <title>Patient Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #bbdefb); /* Soft blue-green to light blue */
+            background-size: 200% 200%;
+            animation: gradientAnimation 10s ease infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fadeInSlideUp {
+            animation: fadeInSlideUp 0.8s ease-out forwards;
+        }
+
+        .form-input-focus:focus {
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* blue-500 with 0.5 opacity */
+        }
+
+        .btn-gradient {
+            background: linear-gradient(to right, #2563eb, #3b82f6); /* Blue-700 to Blue-500 */
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(to right, #1d4ed8, #2563eb); /* Darker blue on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .message-box {
+            top: 1rem;
+            right: 1rem;
+            max-width: 300px;
+            z-index: 1000;
+            animation: slideInFromRight 0.5s ease-out forwards, fadeOut 0.5s ease-out 4s forwards;
+            opacity: 0; /* Hidden by default */
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div id="messageBox" class="message-box fixed p-4 rounded-lg shadow-lg text-white hidden"></div>
+
+    <div class="w-full max-w-md bg-white shadow-xl rounded-lg p-8 border border-blue-200 animate-fadeInSlideUp">
+        <h2 class="text-3xl font-bold text-blue-700 mb-8 text-center flex items-center justify-center space-x-3">
+            <i class="fas fa-user-plus text-blue-500"></i>
+            <span>Patient Registration</span>
+        </h2>
+
+        <form id="registerForm" class="space-y-6" novalidate>
+            <div>
+                <label for="name" class="block font-medium text-gray-700 mb-1 flex items-center">
+                    <i class="fas fa-user mr-2 text-blue-500"></i>Full Name
+                </label>
+                <input type="text" id="name" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none form-input-focus transition duration-200 ease-in-out" placeholder="Enter full name" required>
+            </div>
+
+            <div>
+                <label for="email" class="block font-medium text-gray-700 mb-1 flex items-center">
+                    <i class="fas fa-envelope mr-2 text-blue-500"></i>Email Address
+                </label>
+                <input type="email" id="email" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none form-input-focus transition duration-200 ease-in-out" placeholder="Enter email" required>
+                <p id="emailError" class="text-red-600 text-sm mt-2 hidden flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Please enter a valid email address.
+                </p>
+            </div>
+
+            <div>
+                <label for="number" class="block font-medium text-gray-700 mb-1 flex items-center">
+                    <i class="fas fa-phone mr-2 text-blue-500"></i>Phone Number
+                </label>
+                <input type="text" id="number" maxlength="10" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none form-input-focus transition duration-200 ease-in-out" placeholder="10-digit number" required>
+                <p id="numberError" class="text-red-600 text-sm mt-2 hidden flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Phone number must be 10 digits.
+                </p>
+            </div>
+
+            <div>
+                <label for="address" class="block font-medium text-gray-700 mb-1 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>Address
+                </label>
+                <input type="text" id="address" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none form-input-focus transition duration-200 ease-in-out" placeholder="Enter address" required>
+            </div>
+
+            <div>
+                <label for="password" class="block font-medium text-gray-700 mb-1 flex items-center">
+                    <i class="fas fa-lock mr-2 text-blue-500"></i>Password
+                </label>
+                <input type="password" id="password" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none form-input-focus transition duration-200 ease-in-out" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit" class="w-full btn-gradient text-white py-3 rounded-md font-semibold text-lg flex items-center justify-center space-x-2">
+                <i class="fas fa-paper-plane"></i>
+                <span>Register Account</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const emailInput = document.getElementById("email");
+        const numberInput = document.getElementById("number");
+        const emailError = document.getElementById("emailError");
+        const numberError = document.getElementById("numberError");
+        const messageBox = document.getElementById("messageBox");
+
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = 'message-box fixed p-4 rounded-lg shadow-lg text-white'; // Reset classes
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-500');
+            } else if (type === 'error') {
+                messageBox.classList.add('bg-red-500');
+            }
+            messageBox.classList.remove('hidden');
+            // Hide after 3 seconds, matching fadeOut animation duration
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 4500); // 4s animation + 0.5s buffer
+        }
+
+        numberInput.addEventListener("input", () => {
+            numberInput.value = numberInput.value.replace(/\D/g, "").slice(0, 10);
+            numberError.classList.toggle("hidden", numberInput.value.length === 10);
+        });
+
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const email = emailInput.value.trim();
+            const number = numberInput.value.trim();
+            const address = document.getElementById("address").value.trim();
+            const password = document.getElementById("password").value;
+
+            // Clear previous errors
+            emailError.classList.add("hidden");
+            numberError.classList.add("hidden");
+
+            // Basic required field validation for all fields
+            if (!name || !email || !number || !address || !password) {
+                showMessage("All fields are required.", "error");
+                return;
+            }
+
+            // Email validation
+            if (!isValidEmail(email)) {
+                emailError.classList.remove("hidden");
+                showMessage("Please enter a valid email address.", "error");
+                return;
+            }
+
+            // Phone number validation
+            if (number.length !== 10) {
+                numberError.classList.remove("hidden");
+                showMessage("Phone number must be 10 digits.", "error");
+                return;
+            }
+
+            const user = {
+                name,
+                email,
+                number,
+                address,
+                password
+            };
+
+            try {
+                // Assuming BASE_URL is defined in url.js
+                const res = await fetch(`${BASE_URL}/api/patient/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(user),
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showMessage("Registration successful! Redirecting to login...", "success");
+                    // Optionally clear form or redirect faster
+                    setTimeout(() => {
+                        window.location.href = "patient_login.html";
+                    }, 2000); // Redirect after 2 seconds
+                } else {
+                    showMessage(data.message || "Registration failed. Please try again.", "error");
+                }
+            } catch (error) {
+                showMessage("Error connecting to server. Please try again.", "error");
+                console.error("Fetch error:", error);
+            }
+        });
+    </script>
+</body>
+</html>
