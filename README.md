@@ -208,11 +208,7 @@ hospital-management-system/
 
 ## 🧑‍💻 Author
 
-Developed by [Your Name]  
+Developed by Vinit Panchal  
 Feel free to contribute or open issues for improvements.
 
 ---
-
-## 📜 License
-
-This project is open source and available under the [MIT License](LICENSE).
